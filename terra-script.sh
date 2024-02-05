@@ -11,11 +11,11 @@ stop_terra() {
 }
 
 start_infra() {
-  # echo "Creating ECRs..."
-  # cd ecr
-  # start_terra
+  echo "Creating ECRs..."
+  cd ecr
+  start_terra
   echo "Starting network..."
-  cd network
+  cd ../network
   start_terra
   echo "Starting webserver..."
   cd ../webserver
@@ -35,9 +35,9 @@ stop_infra() {
   echo "Deleting network..."
   cd ../network
   stop_terra
-  # echo "Deleting ECRs..."
-  # cd ../ecr
-  # stop_terra
+  echo "Deleting ECRs..."
+  cd ../ecr
+  stop_terra
 }
 
 echo "Select an action:"

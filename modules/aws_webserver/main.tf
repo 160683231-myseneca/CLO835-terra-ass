@@ -18,8 +18,8 @@ data "terraform_remote_state" "remote_network_state" {
 resource "aws_s3_object" "script_object" {
   bucket = "bucket-sanah"
   key    = "script/docker-deploy.sh"
-  source = "~/environment/modules/aws_webserver/docker-deploy.sh"
-  etag   = filemd5("~/environment/modules/aws_webserver/docker-deploy.sh") 
+  source = "~/environment/CLO835-terra-ass1/modules/aws_webserver/docker-deploy.sh"
+  etag   = filemd5("~/environment/CLO835-terra-ass1/modules/aws_webserver/docker-deploy.sh") 
 }
 
 data "aws_ami" "latest_amazon_linux" {
@@ -39,7 +39,7 @@ resource "aws_instance" "ec2_instance" {
   subnet_id                   = data.terraform_remote_state.remote_network_state.outputs.public_subnet_ids[count.index]
   security_groups             = [aws_security_group.security_group_ec2.id]
   iam_instance_profile        = "LabInstanceProfile"
-  user_data = templatefile("~/environment/modules/aws_webserver/bashscript.sh.tpl",{})
+  user_data = templatefile("~/environment/CLO835-terra-ass1/modules/aws_webserver/bashscript.sh.tpl",{})
   associate_public_ip_address = true
   root_block_device {
     encrypted = false
