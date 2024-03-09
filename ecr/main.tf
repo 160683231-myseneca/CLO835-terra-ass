@@ -15,7 +15,7 @@ provider "aws" {
 
 resource "aws_ecr_repository" "mysql_image" {
   name = "mysql_image"
-
+  force_delete  = true
   image_scanning_configuration {
     scan_on_push = true
   }
@@ -33,7 +33,7 @@ resource "aws_ecr_repository" "mysql_image" {
 
 resource "aws_ecr_repository" "app_image" {
   name = "app_image"
-
+  force_delete  = true
   image_scanning_configuration {
     scan_on_push = true
   }
@@ -51,7 +51,7 @@ resource "aws_ecr_repository" "app_image" {
 
 resource "aws_ecr_repository" "proxy_image" {
   name = "proxy_image"
-
+  force_delete  = true
   image_scanning_configuration {
     scan_on_push = true
   }

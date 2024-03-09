@@ -1,5 +1,5 @@
 variable "instance_type" {
-  default     = "t2.micro"
+  default     = "c1.medium"
   description = "Type of instance"
   type        = string
 }
