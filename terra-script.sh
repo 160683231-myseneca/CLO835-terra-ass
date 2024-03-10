@@ -19,18 +19,24 @@ start_infra() {
   start_terra
   echo "Starting webserver..."
   cd ../webserver
+  stop_terra
   start_terra
-  echo "Starting alb..."
-  cd ../alb
-  start_terra
+  echo "Enter public ip: "
+  read -s PUBLIC_IP
+  
+  sleep 60s
+  scp -r -i ~/.ssh/sanahkey /home/ec2-user/environment/CLO835-manifest/* ec2-user@$PUBLIC_IP:/home/ec2-user/ 
+  # echo "Starting alb..."
+  # cd ../alb
+  # start_terra
 }
 
 stop_infra() {
-  echo "Deleting alb..."
-  cd alb
-  stop_terra
+  # echo "Deleting alb..."
+  # cd alb
+  # stop_terra
   echo "Deleting webserver..."
-  cd ../webserver
+  cd webserver
   stop_terra
   echo "Deleting network..."
   cd ../network

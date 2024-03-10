@@ -6,20 +6,43 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
+data "aws_s3_bucket" "my_bucket" {
+  bucket = "bucket-sanah"
+}
+
+# locals {
+#   base_dir = "${path.module}/../../CLO835-manifest"
+
+#   directories = [
+#     "", 
+#     "kubChart/",
+#     "kubChart/templates/",
+#     "kubChart/charts/",
+#     "kubManifest/",
+#   ]
+
+#   all_files = toset(flatten([
+#     for dir in local.directories : fileset("${local.base_dir}/${dir}", "*")
+#   ]))
+# }
+
+
+# resource "aws_s3_object" "remote_object2" {
+#   for_each = local.all_files
+
+#   bucket = data.aws_s3_bucket.my_bucket.bucket
+#   key    = substr(each.value, 6, length(each.value)) 
+#   source = each.value
+#   etag   = filemd5(each.value)
+# }
+
 data "terraform_remote_state" "remote_network_state" {
   backend = "s3"
   config = {
-    bucket = "bucket-sanah"
+    bucket = data.aws_s3_bucket.my_bucket.bucket
     key    = "network/terraform.tfstate"
     region = "us-east-1"
   }
-}
-
-resource "aws_s3_object" "script_object" {
-  bucket = "bucket-sanah"
-  key    = "script/docker-deploy.sh"
-  source = "~/environment/modules/aws_webserver/docker-deploy.sh"
-  etag   = filemd5("~/environment/modules/aws_webserver/docker-deploy.sh") 
 }
 
 data "aws_ami" "latest_amazon_linux" {
@@ -39,7 +62,7 @@ resource "aws_instance" "ec2_instance" {
   subnet_id                   = data.terraform_remote_state.remote_network_state.outputs.public_subnet_ids[count.index]
   security_groups             = [aws_security_group.security_group_ec2.id]
   iam_instance_profile        = "LabInstanceProfile"
-  user_data = templatefile("~/environment/modules/aws_webserver/bashscript.sh.tpl",{})
+  user_data = templatefile("/home/ec2-user/environment/CLO835-terra-ass/modules/aws_webserver/bashscript.sh.tpl",{})
   associate_public_ip_address = true
   root_block_device {
     encrypted = false
@@ -75,10 +98,26 @@ resource "aws_security_group" "security_group_ec2" {
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
   }
+    ingress {
+    description      = "HTTPS from everywhere"
+    from_port        = 443
+    to_port          = 443
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+   ingress {
+    description      = "HTTP on additional ports"
+    from_port        = 30000
+    to_port          = 31000
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
    ingress {
     description      = "HTTP on additional ports"
     from_port        = 8080
-    to_port          = 8083
+    to_port          = 8080
     protocol         = "tcp"
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
